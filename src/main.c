@@ -39,7 +39,7 @@ int main(void)
     //start_display();
     //write_display();
     run_adc();
-    // PLEASE SEE MY COMMIT NOT
+    // PLEASE SEE MY COMMIT NOW
     testbench(&controllers);
 	for(;;);
 }
