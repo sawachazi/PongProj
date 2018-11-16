@@ -1,0 +1,9 @@
+# ignore all executable files
+**/Debug
+*.o
+*.d
+*.exe
+**/Binaries
+
+
+
