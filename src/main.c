@@ -38,10 +38,10 @@ int main(void)
     init_usart2();
     //start_display();
     //write_display();
-    run_adc();
+    //run_adc();
     // PLEASE SEE MY COMMIT NOW
     testbench(&controllers);
-	for(;;);
+
 }
 
 /*
