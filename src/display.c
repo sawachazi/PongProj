@@ -207,7 +207,12 @@ void initilize_display(){
     // every other "page"
     int x;
     for(x = 0;x < 8;x++){
-
+        GPIOB->BSRR = CS1;
+        set_x_addr(x);
+        set_y_addr(62);
+        write_display(0xf);
+        write_display(0xf);
+        GPIOB->BRR = CS2;
     }
 
 }
