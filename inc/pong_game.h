@@ -8,6 +8,17 @@
 #ifndef PONG_GAME_H_
 #define PONG_GAME_H_
 
+typedef struct PongBall{
+    int posX;
+    int posY;
+    int volX;
+    int volY;
+} Ball;
 
+
+typedef struct PongPaddle{
+    int posY;
+    int volY;
+} Paddle;
 
 #endif /* PONG_GAME_H_ */

@@ -38,6 +38,7 @@ int main(void)
     init_usart2();
     //start_display();
     //write_display();
+    //display1("hello");
     //run_adc();
     // PLEASE SEE MY COMMIT NOW
     // test
@@ -50,8 +51,8 @@ int main(void)
  *
  *  PB0-PB12 as GPIO outputs
  *  PB0-PB7 connected to DISPLAY DB0-DB7
- *  PB8 connected to DISPLAY Chip Select 1 (CS2)
- *  PB9 connected to DISPLAY Chip Select 2 (CS1)
+ *  PB8 connected to DISPLAY Chip Select for IC2 (CS2)
+ *  PB9 connected to DISPLAY Chip Select for IC1 (CS1)
  *  PB10 connected to DISPLAY Reset signal (RES)
  *  PB11 connected to DISPLAY instruction code (D/I)
  *  PB12 connected to DISPLAY Enable (E)
@@ -71,7 +72,8 @@ void init_gpio(void){
     GPIOB->MODER = ~(0x3ffffff);
     GPIOB->MODER |= 0x1555555; // set as outputs
     GPIOB->ODR &= ~(0x1fff); // initialize to 0;
-    GPIOB->ODR |= 0x100;
+    GPIOB->ODR |= EN;
+    GPIOB->ODR |= CS1;
 
     // Controller INITIALIZATION
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;

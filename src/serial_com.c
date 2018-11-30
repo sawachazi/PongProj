@@ -164,24 +164,45 @@ void action(char **words, uint16_t * controllers) {
         }
         if (strcasecmp(words[0], "write") == 0){
             if (strcasecmp(words[1], "display") == 0){
-                write_display();
+                write_display((int)strtoul(words[2], 0, 10));
+                return;
+            }
+            if (strcasecmp(words[1], "alot") == 0){
+                write_alot();
                 return;
             }
 
+        }
+        if (strcasecmp(words[0], "clear") == 0){
+            if (strcasecmp(words[1], "screen") == 0){
+                clear_screen();
+                return;
+            }
         }
         if (strcasecmp(words[0], "display") == 0){
             if (strcasecmp(words[1], "on") == 0){
                 display_on();
                 return;
             }
-        }
-        if (strcasecmp(words[0], "display") == 0){
             if (strcasecmp(words[1], "off") == 0){
                 display_off();
                 return;
             }
         }
-
+        if (strcasecmp(words[0], "set") == 0){
+            if (strcasecmp(words[1], "y") == 0){
+                set_y_addr((int)strtoul(words[2], 0 ,10));
+                return;
+            }
+            if (strcasecmp(words[1], "x") == 0){
+                set_x_addr((int)strtoul(words[2], 0,10));
+                return;
+            }
+            if (strcasecmp(words[1], "start") == 0){
+                set_display_start((int)strtoul(words[2], 0, 10));
+                return;
+            }
+        }
 
         println("Unrecognized command.");
     }
