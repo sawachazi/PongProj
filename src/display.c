@@ -154,6 +154,7 @@ void write_display(int x){
     GPIOB->BSRR = RS; // set D/I (RS) on/off
     nano_wait(500);
     GPIOB->BSRR = EN; // enable on and set data
+    x &= 0xff;
     GPIOB->BSRR = x;
     //GPIOB->BRR = 0xff;
     nano_wait(10000);
@@ -200,8 +201,10 @@ void clear_screen(void){
 void initialize_display(){
     set_side(1);
     display_on();
+    set_display_start(0);
     set_side(2);
     display_on();
+    set_display_start(0);
     clear_screen();
     set_side(1);
     clear_screen();
@@ -226,8 +229,8 @@ void initialize_display(){
 void get_ball_bits(int x, int * upper_bits, int * lower_bits, int * full_bits){
     if ((x % 8) >  (8 - BALL_S)){
         // if you must set bits in more than row
-        *upper_bits = 0xff >> (8 - x % 8);
-        *lower_bits = 0xff << (8 - (x % 8 - BALL_S));
+        *upper_bits = 0xff << (x % 8);
+        *lower_bits = 0xff >> (8 - (x % 8 - BALL_S));
         *full_bits = 0x55;
     }else{
        *full_bits = 0xff >> (8 - BALL_S);
@@ -243,11 +246,10 @@ void delete_old_ball(int x, int y){
     int full_bits;
     int row;
     int i;
-    row = x / 8;
-    if(y > 63){
-        GPIOB->BRR = CS2;
-        GPIOB->BSRR = CS1;
-        set_col_addr(y - 63);
+    row = x / DISP_R;
+    if(y > DISP_S - 1){
+        set_side(2);
+        set_col_addr(y - DISP_S);
         get_ball_bits(x, &upper_bits, &lower_bits, &full_bits);
         if (full_bits == 0x55){
             set_row_addr(row);
@@ -259,61 +261,57 @@ void delete_old_ball(int x, int y){
                 write_display(0x00);
             }
         }else{
-           full_bits = 0xff >> (8 - BALL_S);
-           full_bits = 0xff << x % 8;
-
+           set_row_addr(row);
            for(i = 0; i < BALL_S;i++){
                write_display(0x00);
            }
         }
     }else{
         get_ball_bits(x, &upper_bits, &lower_bits, &full_bits);
-        GPIOB->BRR = CS2;
-        GPIOB->BSRR = CS1;
-        if (y + BALL_S > 63){
+        if (y + BALL_S > DISP_S){
             // Select CS1 set bits
             if (full_bits == 0x55){
+                set_side(1);
                 set_row_addr(row);
                 set_col_addr(y);
                 // write upper bits
                 for(i = y; i < (y + BALL_S);i++){
-                    if (i == 63){
+                    if (i == DISP_S - 1){
                         // Select CS2 set bits
                         write_display(0x00);
-                        GPIOB->BRR = CS1;
-                        GPIOB->BSRR = CS2;
+                        set_side(2);
                         set_col_addr(0);
                         set_row_addr(row);
                     }else{
                         write_display(0x00);
                     }
                 }
+                set_side(1);
                 set_row_addr(row + 1);
                 set_col_addr(y);
-                GPIOB->BRR = CS2;
-                GPIOB->BSRR = CS1;
                 // write lower bits
                 for(i = y; i < (y + BALL_S);i++){
-                    if (i == 63){
+                    if (i == DISP_S - 1){
                         // Select CS2 set bits
                         write_display(0x00);
-                        GPIOB->BRR = CS1;
-                        GPIOB->BSRR = CS2;
+                        set_side(2);
                         set_col_addr(0);
-                        set_row_addr(row);
+                        set_row_addr(row + 1);
                     }else{
                         write_display(0x00);
                     }
                 }
             }else{
+                set_side(1);
                 set_row_addr(row);
                 set_col_addr(y);
                 for(i = y;i < (y+BALL_S);i++){
-                    if (i == 63){
+                    if (i == DISP_S - 1){
                         // Select CS2 set bits
                         write_display(0x00);
-                        GPIOB->BRR = CS1;
-                        GPIOB->BSRR = CS2;
+                        set_side(2);
+                        set_row_addr(row);
+                        set_col_addr(0);
                     }
                     write_display(0x00);
                 }
@@ -321,9 +319,8 @@ void delete_old_ball(int x, int y){
 
         }else{
             // you need to write to left screen and not to right.
-            GPIOB->BRR = CS2;
-            GPIOB->BSRR = CS1;
-            if (full_bits == 0xff){
+            set_side(1);
+            if (full_bits == 0x55){
                 set_row_addr(row);
                 set_col_addr(y);
                 for(i = 0;i < BALL_S;i++){
@@ -360,10 +357,9 @@ void display_ball(int x, int y){
     }
 
     // turn on bits of new position
-    if(y > 63){
-        GPIOB->BRR = CS2;
-        GPIOB->BSRR = CS1;
-        set_col_addr(y - 63);
+    if(y >= DISP_S){
+        set_side(2);
+        set_col_addr(y - DISP_S);
         get_ball_bits(x, &upper_bits, &lower_bits, &full_bits);
         if (full_bits == 0x55){
             set_row_addr(row);
@@ -371,75 +367,70 @@ void display_ball(int x, int y){
                 write_display(upper_bits);
             }
             set_row_addr(row+1);
+            set_col_addr(y - DISP_S);
             for(i = 0; i < BALL_S;i++){
                 write_display(lower_bits);
             }
         }else{
-           full_bits = 0xff >> (8 - BALL_S);
-           full_bits = 0xff << x % 8;
-
+           set_row_addr(row);
            for(i = 0; i < BALL_S;i++){
                write_display(full_bits);
            }
         }
     }else{
         get_ball_bits(x, &upper_bits, &lower_bits, &full_bits);
-        GPIOB->BRR = CS2;
-        GPIOB->BSRR = CS1;
-        if (y + BALL_S > 63){
+        if (y + BALL_S >= DISP_S){
             // Select CS1 set bits
             if (full_bits == 0x55){
+                set_side(1);
                 set_row_addr(row);
                 set_col_addr(y);
                 // write upper bits
                 for(i = y; i < (y + BALL_S);i++){
-                    if (i == 63){
+                    if (i == DISP_S - 1){
                         // Select CS2 set bits
                         write_display(upper_bits);
-                        GPIOB->BRR = CS1;
-                        GPIOB->BSRR = CS2;
+                        set_side(2);
                         set_col_addr(0);
                         set_row_addr(row);
                     }else{
                         write_display(upper_bits);
                     }
                 }
+                set_side(1);
                 set_row_addr(row + 1);
                 set_col_addr(y);
-                GPIOB->BRR = CS2;
-                GPIOB->BSRR = CS1;
                 // write lower bits
                 for(i = y; i < (y + BALL_S);i++){
-                    if (i == 63){
+                    if (i == DISP_S - 1){
                         // Select CS2 set bits
                         write_display(lower_bits);
-                        GPIOB->BRR = CS1;
-                        GPIOB->BSRR = CS2;
+                        set_side(2);
                         set_col_addr(0);
-                        set_row_addr(row);
+                        set_row_addr(row + 1);
                     }else{
                         write_display(lower_bits);
                     }
                 }
             }else{
+                set_side(1);
                 set_row_addr(row);
                 set_col_addr(y);
-                for(i = y;y < (y+BALL_S);i++){
-                    if (i == 63){
+                for(i = y;i < (y+BALL_S);i++){
+                    if (i == DISP_S - 1){
                         // Select CS2 set bits
                         write_display(full_bits);
-                        GPIOB->BRR = CS1;
-                        GPIOB->BSRR = CS2;
+                        set_side(2);
+                        set_row_addr(row);
+                        set_col_addr(0);
                     }
                     write_display(full_bits);
                 }
             }
-
         }else{
             // you need to write to left screen and not to right.
-            GPIOB->BRR = CS2;
-            GPIOB->BSRR = CS1;
-            if (full_bits == 0xff){
+            set_side(1);
+            if (full_bits == 0x55){
                 set_row_addr(row);
                 set_col_addr(y);
                 for(i = 0;i < BALL_S;i++){
@@ -470,7 +461,7 @@ void display_test(){
     for(x = BALL_S; x < 64 - BALL_S;x += BALL_S){
         for(y = BALL_S;y < 128 - BALL_S;y += BALL_S){
             display_ball(x, y);
-            nano_wait(100000);
+            nano_wait(100000000);
         }
     }
 }
@@ -499,15 +490,6 @@ void set_side(int x){
     }
 }
 
-void test_paddle(){
-    int i;
-    for(i = 0;i < 64;i++){
-        display_pong1(i);
-        nano_wait(100000000);
-        display_pong2(i);
-        nano_wait(100000000);
-    }
-}
 
 void dipslay_pong1(int y){
 	set_side(1);
@@ -585,32 +567,33 @@ void display_pong2(int y){
 	int x = 0;
 
 	//turn off old bits
-	if (paddle2_last_y < 8){
-		rem = paddle2_last_y;
-	}
-	else if (paddle2_last_y > 56){
-		paddle2_last_y = 48;
-	}
-	set_row_addr(paddle2_last_y / 8); //initial page of paddle
-	for (x = 0; x < PADDLE_W;  x++){
-		set_col_addr((PADDLE_W / 2) + x);
-		write_display(0x0);
-	}
-	rem2 = 16 - (8 - rem);
-	set_row_addr((paddle2_last_y / 8) + 1); //second page of paddle
-	for (x = 0; x < PADDLE_W;  x++){
-		set_col_addr((PADDLE_W / 2) + x);
-		write_display(0x0);
-	}
-	if (rem2 > 8){ //check to verifpaddle2_last_y a 3rd page needed
-		set_row_addr((paddle2_last_y / 8) + 2);
-		rem3 = 16 - rem2;
+	if (paddle1_last_y >= 0){
+		if (paddle2_last_y > 8){
+			rem = paddle2_last_y;
+		}
+		else if (paddle2_last_y > 56){
+			paddle2_last_y = 48;
+		}
+		set_row_addr(paddle2_last_y / 8); //initial page of paddle
 		for (x = 0; x < PADDLE_W;  x++){
-			set_col_addr((PADDLE_W / 2) + x);
+			set_col_addr(64 - (PADDLE_W / 2) - x);
 			write_display(0x0);
 		}
+		rem2 = 16 - (8 - rem);
+		set_row_addr((paddle2_last_y / 8) + 1); //second page of paddle
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr(64 - (PADDLE_W / 2) - x);
+			write_display(0x0);
+		}
+		if (rem2 > 8){ //check to verifpaddle2_last_y a 3rd page needed
+			set_row_addr((paddle2_last_y / 8) + 2);
+			rem3 = 16 - rem2;
+			for (x = 0; x < PADDLE_W;  x++){
+				set_col_addr(64 - (PADDLE_W / 2) - x);
+				write_display(0x0);
+			}
+		}
 	}
-
 	//turn on new bits;
 	if (y < 8){
 		rem = y;
@@ -620,20 +603,20 @@ void display_pong2(int y){
 	}
 	set_row_addr(y / 8); //initial page of paddle
 	for (x = 0; x < PADDLE_W;  x++){
-		set_col_addr((PADDLE_W / 2) + x);
+		set_col_addr(64 - (PADDLE_W / 2) - x);
 		write_display(0xff << rem);
 	}
 	rem2 = 16 - (8 - rem);
 	set_row_addr((y / 8) + 1); //second page of paddle
 	for (x = 0; x < PADDLE_W;  x++){
-		set_col_addr((PADDLE_W / 2) + x);
+		set_col_addr(64 - (PADDLE_W / 2) - x);
 		write_display(0xff); //will always write 8 bits to second called page for paddle
 	}
 	if (rem2 > 8){ //check to verify a 3rd page needed
 		set_row_addr((y / 8) + 2);
 		rem3 = 16 - rem2;
 		for (x = 0; x < PADDLE_W;  x++){
-			set_col_addr((PADDLE_W / 2) + x);
+			set_col_addr(64 - (PADDLE_W / 2) + x);
 			write_display(0xff >> (8- rem3));
 		}
 	}
