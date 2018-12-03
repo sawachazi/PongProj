@@ -23,7 +23,8 @@
 #define CS2 0x100
 #define CS1 0x200
 
-#define BALL_S 4
+
+#define BALL_S 4 // must stay under 8
 #define PADDLE_W 8
 #define PADDLE_L 16
 
