@@ -218,6 +218,14 @@ void action(char **words, uint16_t * controllers) {
                 return;
             }
         }
+        if (strcasecmp(words[0], "audio") == 0){
+        	if(strcasecmp(words[1], "collision") == 0){
+        		collision();
+        	}
+        	if(strcasecmp(words[1], "score") == 0){
+        		score();
+        	}
+        }
 
         println("Unrecognized command.");
     }
