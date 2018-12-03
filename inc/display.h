@@ -23,6 +23,9 @@
 #define CS2 0x100
 #define CS1 0x200
 
+#define BALL_S 4
+#define PADDLE_W 8
+#define PADDLE_L 16
 
 void write_display(int);
 void display_off();
@@ -31,7 +34,7 @@ void set_col_addr(int);
 void set_display_start(int);
 void set_row_addr(int);
 void write_alot();
-
+void set_side(int);
 
 void clear_screen(void);
 void initialize_display(void);
