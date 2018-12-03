@@ -537,10 +537,10 @@ void dipslay_pong1(int y){
 	}
 	set_row_addr(y / 8); //initial page of paddle
 	for (x = 0; x < PADDLE_W;  x++){
-		set_col_addr((PADDLE_W / 2) + x);
+		//set_col_addr((PADDLE_W / 2) + x);
 		write_display(0xff << rem);
 	}
-	rem2 = 16 - (8 - rem);
+	rem2 = 16 - 8 - rem;
 	set_row_addr((y / 8) + 1); //second page of paddle
 	for (x = 0; x < PADDLE_W;  x++){
 		set_col_addr((PADDLE_W / 2) + x);
