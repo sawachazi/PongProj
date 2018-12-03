@@ -23,16 +23,14 @@
 #define CS2 0x100
 #define CS1 0x200
 
-
-void start_display();
 void write_display(int);
 void display_off();
 void display_on();
-void set_y_addr(int);
+void set_col_addr(int);
 void set_display_start(int);
-void set_x_addr(int);
+void set_row_addr(int);
 void write_alot();
-
+void set_side(int);
 
 void clear_screen(void);
 void initialize_display(void);

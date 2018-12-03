@@ -5,12 +5,11 @@
  *      Author: zachwalters
  */
 #include "serial_com.h"
-
 #include "stm32f0xx.h"
 #include "stm32f0_discovery.h"
 #include <string.h>
 #include <stdlib.h> // for strtoul()
-
+#include "display.h"
 
 void init_usart2(void){
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
@@ -156,12 +155,6 @@ void action(char **words, uint16_t * controllers) {
                 return;
             }
         }
-        if (strcasecmp(words[0],"start") == 0) {
-            if (strcasecmp(words[1], "display") == 0){
-                start_display();
-                return;
-            }
-        }
         if (strcasecmp(words[0], "write") == 0){
             if (strcasecmp(words[1], "display") == 0){
                 write_display((int)strtoul(words[2], 0, 10));
@@ -188,18 +181,40 @@ void action(char **words, uint16_t * controllers) {
                 display_off();
                 return;
             }
-        }
-        if (strcasecmp(words[0], "set") == 0){
-            if (strcasecmp(words[1], "y") == 0){
-                set_y_addr((int)strtoul(words[2], 0 ,10));
+            if(strcasecmp(words[1], "ball") == 0){
+                display_ball((int)strtoul(words[2], 0, 10), (int)strtoul(words[3], 0, 10));
                 return;
             }
-            if (strcasecmp(words[1], "x") == 0){
-                set_x_addr((int)strtoul(words[2], 0,10));
+            if(strcasecmp(words[1], "initialize") == 0){
+                initialize_display();
+                return;
+            }
+            if(strcasecmp(words[1], "test") == 0){
+                display_test();
+                return;
+            }
+        }
+        if (strcasecmp(words[0], "set") == 0){
+            if (strcasecmp(words[1], "column") == 0){
+                set_col_addr((int)strtoul(words[2], 0 ,10));
+                return;
+            }
+            if (strcasecmp(words[1], "row") == 0){
+                set_row_addr((int)strtoul(words[2], 0,10));
                 return;
             }
             if (strcasecmp(words[1], "start") == 0){
                 set_display_start((int)strtoul(words[2], 0, 10));
+                return;
+            }
+            if (strcasecmp(words[1], "side") == 0){
+                set_side((int)strtoul(words[2], 0 ,10));
+                return;
+            }
+        }
+        if (strcasecmp(words[0], "test") == 0){
+            if (strcasecmp(words[1], "line") == 0){
+                test_line((int)strtoul(words[2], 0, 10));
                 return;
             }
         }
