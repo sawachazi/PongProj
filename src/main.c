@@ -35,6 +35,7 @@ int main(void)
     // might need to calibrate: FRM: A.7.1
     init_adc();
     init_dma();
+    init_audio();
     init_usart2();
     init_audio();
     //start_display();
