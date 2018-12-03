@@ -218,6 +218,12 @@ void action(char **words, uint16_t * controllers) {
                 return;
             }
         }
+        if (strcasecmp(words[0], "test") == 0){
+			if (strcasecmp(words[1], "paddle") == 0){
+				test_paddle();
+				return;
+			}
+		}
 
         println("Unrecognized command.");
     }
