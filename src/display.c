@@ -8,6 +8,10 @@
 #include "stm32f0xx.h"
 #include "stm32f0_discovery.h"
 #include "display.h"
+#define BALL_R 4
+#define PADDLE_W 8
+#define PADDLE_L 16
+
 
 /*
  *  PB0-PB12 as GPIO outputs
@@ -54,7 +58,7 @@ void display_on(){
     GPIOB->BSRR = EN; // set enable on
     nano_wait(500);
     //while(1){
-        //set_y_addr(0);
+        //set_col_addr(0);
         //set_display_start(0);
         //nano_wait(10000);
         //write_display();
@@ -67,7 +71,7 @@ void display_on(){
 //    GPIOB->BSRR |= (0x1000 << 16);
 }
 
-void set_y_addr(int x){
+void set_col_addr(int x){
     // x addr must b 5 bit;
     if (x >  63){
         return;
@@ -118,7 +122,7 @@ void set_display_start(int x){
 //    GPIOB->BRR = EN;
 }
 
-void set_x_addr(int x){
+void set_row_addr(int x){
     if (x > 7){
         return;
     }
@@ -141,15 +145,6 @@ void set_x_addr(int x){
 //    GPIOB->BSRR |= (0x1000);
 //    nano_wait(100000);
 //    GPIOB->BSRR |= (0x1000 << 16);
-}
-
-void start_display(){
-    // turn display on
-    GPIOB->BSRR |= 0x3f;
-    GPIOB->BSRR |= (0x1 << 27);
-    GPIOB->BSRR |= (0x1000);
-    nano_wait(100000);
-    GPIOB->BSRR |= (0x1000 << 16);
 }
 
 void write_display(int x){
@@ -192,8 +187,8 @@ void clear_screen(void){
     int y;
     int x;
     for (x = 0;x < 8; x++){
-        set_x_addr(x);
-        set_y_addr(0);
+        set_row_addr(x);
+        set_col_addr(0);
         for(y = 0;y < 64; y++){
             write_display(0x0);
         }
@@ -208,8 +203,8 @@ void initilize_display(){
     int x;
     for(x = 0;x < 8;x++){
         GPIOB->BSRR = CS1;
-        set_x_addr(x);
-        set_y_addr(62);
+        set_row_addr(x);
+        set_col_addr(62);
         write_display(0xf);
         write_display(0xf);
         GPIOB->BRR = CS2;
@@ -217,12 +212,142 @@ void initilize_display(){
 
 }
 
-void clear_screen(void);
-void display_ball(int, int);
-void display_pong1(int);
-void display_pong2(int);
-void display_score(int, int);
-void display_start_screen();
-void display_winner(int);
-void display_start_wait();
+
+int paddle1_last_y = -1;
+int paddle2_last_y = -1;
+
+void dipslay_pong1(int y){
+	GPIOB->BSRR = CS1;
+	GPIOB->BRR = CS2;
+	set_col_addr(PADDLE_W / 2);
+	int rem = y % 8;
+	int rem2 = 0;
+	int rem3 = 0;
+	int x = 0;
+
+	//turn off old bits
+	if (paddle1_last_y >= 0){
+		if (paddle1_last_y < 8){
+			rem = paddle1_last_y;
+		}
+		set_row_addr(paddle1_last_y / 8); //initial page of paddle
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr((PADDLE_W / 2) + x);
+			write_display(0x0);
+		}
+		rem2 = 16 - (8 - rem);
+		set_row_addr((paddle1_last_y / 8) + 1); //second page of paddle
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr((PADDLE_W / 2) + x);
+			write_display(0x0); //will alwapaddle1_last_ys write 8 bits to second called page for paddle
+		}
+		if (rem2 > 8){ //check to verifpaddle1_last_y a 3rd page needed
+			set_row_addr((paddle1_last_y / 8) + 2);
+			rem3 = 16 - rem2;
+			for (x = 0; x < PADDLE_W;  x++){
+				set_col_addr((PADDLE_W / 2) + x);
+				write_display(0x0);
+			}
+		}
+	}
+
+	//turn on new bits;
+	if (y < 8){
+		rem = y;
+	}
+	set_row_addr(y / 8); //initial page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr((PADDLE_W / 2) + x);
+		write_display(8 - rem);
+	}
+	rem2 = 16 - (8 - rem);
+	set_row_addr((y / 8) + 1); //second page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr((PADDLE_W / 2) + x);
+		write_display(0xff); //will always write 8 bits to second called page for paddle
+	}
+	if (rem2 > 8){ //check to verify a 3rd page needed
+		set_row_addr((y / 8) + 2);
+		rem3 = 16 - rem2;
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr((PADDLE_W / 2) + x);
+			write_display(8 - rem3);
+		}
+	}
+	//update last position
+	paddle1_last_y = y;
+	}
+
+void display_pong2(int y){
+	GPIOB->BSRR = CS2;
+	GPIOB->BRR = CS1;
+	set_col_addr(PADDLE_W / 2);
+	int rem = y % 8;
+	int rem2 = 0;
+	int rem3 = 0;
+	int x = 0;
+
+	//turn off old bits
+	if (paddle2_last_y < 8){
+		rem = paddle2_last_y;
+	}
+	set_row_addr(paddle2_last_y / 8); //initial page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr((PADDLE_W / 2) + x);
+		write_display(0x0);
+	}
+	rem2 = 16 - (8 - rem);
+	set_row_addr((paddle2_last_y / 8) + 1); //second page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr((PADDLE_W / 2) + x);
+		write_display(0x0); //will alwapaddle2_last_ys write 8 bits to second called page for paddle
+	}
+	if (rem2 > 8){ //check to verifpaddle2_last_y a 3rd page needed
+		set_row_addr((paddle2_last_y / 8) + 2);
+		rem3 = 16 - rem2;
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr((PADDLE_W / 2) + x);
+			write_display(0x0);
+		}
+	}
+
+	//turn on new bits;
+	if (y < 8){
+		rem = y;
+	}
+	set_row_addr(y / 8); //initial page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr((PADDLE_W / 2) + x);
+		write_display(8 - rem);
+	}
+	rem2 = 16 - (8 - rem);
+	set_row_addr((y / 8) + 1); //second page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr((PADDLE_W / 2) + x);
+		write_display(0xff); //will always write 8 bits to second called page for paddle
+	}
+	if (rem2 > 8){ //check to verify a 3rd page needed
+		set_row_addr((y / 8) + 2);
+		rem3 = 16 - rem2;
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr((PADDLE_W / 2) + x);
+			write_display(8 - rem3);
+		}
+	}
+	//update last position
+	paddle2_last_y = y;
+}
+
+void display_score(int, int){
+
+}
+void display_start_screen(){
+
+}
+void display_winner(int){
+
+}
+void display_start_wait(){
+
+}
 
