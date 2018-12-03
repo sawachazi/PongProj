@@ -36,6 +36,7 @@ int main(void)
     init_adc();
     init_dma();
     init_usart2();
+    init_audio();
     //start_display();
     //write_display();
     //display1("hello");

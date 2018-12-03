@@ -86,3 +86,4 @@ void score(){
 	TIM2->ARR = 80-1;
 	nano_wait(2000000000);
 }
+
