@@ -32,7 +32,20 @@ typedef enum GameScreen {
 
 int padd1PosY = PADDLE_BUFF + PADDLE_W;  // it'll be 5 pixels from edge
 
+<<<<<<< HEAD
+
+int ballSize = 2; // 2 pixels^2
+int paddSizeLen = 16; // paddSizeLen
+int paddSizeWidth = 8; // paddSizeWidth
+
+int padd1PosH = 16;  // it'll be 5 pixels from edge
+int padd2PosH = 123; // 128 - 10 + 5, it will be 5 pixels from edge
+
+int pong1Pos = 64/2; // in center of game board
+int pong2Pos = 64/2; // in center of game board
+=======
 int padd2PosY = DISP_W - PADDLE_BUFF - PADDLE_W; // 128 - 10 + 5, it will be 5 pixels from edge
+>>>>>>> 0222ebc40bb4219c7848a930c4788fe1d99b91d9
 
 int stdVol = 1; // 1 pixel per iteration
 int lastWinner = -1;
