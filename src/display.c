@@ -256,6 +256,7 @@ void delete_old_ball(int x, int y){
             for (i = 0; i < BALL_S;i++){
                 write_display(0x00);
             }
+            set_col_addr(y - DISP_S);
             set_row_addr(row+1);
             for(i = 0; i < BALL_S;i++){
                 write_display(0x00);
@@ -458,11 +459,13 @@ void display_ball(int x, int y){
 void display_test(){
     int x;
     int y;
-    for(x = BALL_S; x < 64 - BALL_S;x += BALL_S){
-        for(y = BALL_S;y < 128 - BALL_S;y += BALL_S){
+    y = 64;
+    for(x = 5; x < 64 - BALL_S;x += BALL_S){
+       // for(y = BALL_S;y < 128 - BALL_S;y += BALL_S){
             display_ball(x, y);
             nano_wait(100000000);
-        }
+            y += BALL_S;
+       // }
     }
 }
 
@@ -477,7 +480,7 @@ void test_line(int x){
 }
 
 void set_side(int x){
-    nano_wait(500);
+    nano_wait(2000);
     if (x == 1){
         GPIOB->BRR = CS2;
         GPIOB->BSRR = CS1;
@@ -629,24 +632,25 @@ void display_pong2(int y){
 }
 
 void display_score(int score1, int score2){
-	char line[18];
-	sprintf(line, "Player 1 score: %d", score1);
-	display1(line);
-	sprintf(line, "Player 2 score: %d", score2);
-	display2(line);
+    char line[16];
+    sprintf(line, "P1 score: %d", score1);
+    display1(line);
+    sprintf(line, "P2 score: %d", score2);
+    display2(line);
 }
 void display_start_screen(){
-	char line[21];
-	sprintf(line, "SLIDE RIGHT TO START");
-	display1(line);
+    char line[16];
+    sprintf(line, "SLIDE RIGHT");
+    display1(line);
 }
 void display_winner(int winner){
-	char line[26];
-	sprintf(line, "Player %d is the winner!", winner);
-	display1(line);
-	sprintf(line, "SLIDE RIGHT TO PLAY", winner);
-	display2(line);
+    char line[16];
+    sprintf(line, "P%d is the winner!", winner);
+    display1(line);
+    sprintf(line, "Slide to start", winner);
+    display2(line);
 }
+
 
 //void (int);
 //void display_pong2(int);

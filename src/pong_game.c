@@ -35,7 +35,7 @@ int padd1PosY = PADDLE_BUFF + PADDLE_W;  // it'll be 5 pixels from edge
 
 int padd2PosY = DISP_W - PADDLE_BUFF - PADDLE_W; // 128 - 10 + 5, it will be 5 pixels from edge
 
-int stdVol = 1; // 1 pixel per iteration
+int stdVol = 2; // 1 pixel per iteration
 int lastWinner = -1;
 
 GameScreen GAMESTATE = STARTSCREEN;
@@ -102,7 +102,7 @@ void play_game(uint16_t * controllers){
             // update position of ball
             update_ball_pos(&square);
             // update paddle1 velocity
-            update_padd_vol(&padd1, controllers[0]);
+            update_padd_vol(&padd2, controllers[0]);
             // update paddle2 velocity
             update_padd_vol(&padd1, controllers[1]);
             // update position of paddle1
@@ -117,9 +117,11 @@ void play_game(uint16_t * controllers){
 
             if (square.posX > DISP_S - BALL_S){
                 square.volX *= -1;
+                //collision();
             }
             if (square.posX < BALL_S){
                 square.volX *= -1;
+                //collision();
             }
             // paddles are 5pxl width and 5 pxls from edge of screen
             if (square.posY >= PADDLE_BUFF && square.posY <= PADDLE_BUFF + PADDLE_W){
@@ -127,6 +129,7 @@ void play_game(uint16_t * controllers){
                 if (square.posX >= padd1.pos && square.posX <= padd1.pos + PADDLE_L){
                     square.posY = PADDLE_BUFF+PADDLE_W+1;
                     square.volY *= -1;
+                    //collision();
                 }
             }
             if (square.posY <= DISP_W - PADDLE_BUFF && square.posY >= DISP_W - PADDLE_BUFF - PADDLE_W){
@@ -134,6 +137,7 @@ void play_game(uint16_t * controllers){
                 if (square.posX >= padd2.pos && square.posX <= padd2.pos + PADDLE_L){
                     square.posY = DISP_W-PADDLE_BUFF-PADDLE_W;
                     square.volY *= -1;
+                    //collision();
                 }
             }
             //      if so update velocity direction
@@ -143,8 +147,10 @@ void play_game(uint16_t * controllers){
                 display_score(pOneScore, pTwoScore);
                 if (pTwoScore == 5){
                     GAMESTATE = END;
+                    win();
                     break;
                 }
+                score();
                 GAMESTATE = START;
             }
             if (square.posY > DISP_W - PADDLE_BUFF){
@@ -152,8 +158,10 @@ void play_game(uint16_t * controllers){
                 display_score(pOneScore, pTwoScore);
                 if (pOneScore == 5){
                     GAMESTATE = END;
+                    win();
                     break;
                 }
+                score();
                 GAMESTATE = START;
             }
             //      if so update score and set GAMESTATE to START
