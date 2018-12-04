@@ -34,7 +34,6 @@ void TIM2_IRQHandler(void) {
 
 	if(tim2_int == 10){
 		TIM2->ARR = 1-1;
-		TIM3->ARR = 1-1;
 		TIM3->CR1 &= ~TIM_CR1_CEN;
 		tim2_int = 0;
 	}
@@ -110,7 +109,7 @@ void collision(){
 void score(){
 	tim2_int = 0;
 	TIM2->ARR = 80-1;
-	nano_wait(2000000000);
+	//ssnano_wait(2000000000);
 }
 
 void init_audio(){
