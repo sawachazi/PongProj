@@ -2,6 +2,7 @@
 **/Debug
 *.o
 *.d
+*.xml
 *.exe
 **/Binaries
 
