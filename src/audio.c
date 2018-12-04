@@ -10,6 +10,7 @@
 
 int tim2_int = 0;
 int game_over = 0;
+int collide = 0;
 
 /*
  * Initlaize PA4, which is used as the audio output for the game
@@ -62,6 +63,7 @@ void TIM2_IRQHandler(void) {
 			TIM2->ARR = 1-1;
 			game_over = 0;
 			tim2_int = 0;
+			collision = 0;
 		}
 	}else{
 		GPIOC->ODR |= (1<<8);
@@ -69,6 +71,8 @@ void TIM2_IRQHandler(void) {
 		if(tim2_int > 6){
 			if(game_over){
 				TIM2->ARR = 1000-1;
+			}else if(collision){
+				TIM2->ARR = 20-1;
 			}else{
 				TIM2->ARR = 400-1;
 			}
@@ -140,8 +144,8 @@ void tim3_init(void) {
 
 void collision(){
 	tim2_int = 8;
-	game_over = 1;
-	TIM2->ARR = 250-1;
+	collision = 1;
+	TIM2->ARR = 20-1;
 }
 
 /*
@@ -166,4 +170,5 @@ void init_audio(){
 	tim3_init();
 	tim2_int = 0;
 	game_over = 0;
+	collision = 0;
 }
