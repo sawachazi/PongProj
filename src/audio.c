@@ -108,7 +108,7 @@ void collision(){
 
 void score(){
 	tim2_int = 0;
-	TIM2->ARR = 80-1;
+	TIM2->ARR = 100-1;
 	//ssnano_wait(2000000000);
 }
 
