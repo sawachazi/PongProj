@@ -221,9 +221,15 @@ void action(char **words, uint16_t * controllers) {
         if (strcasecmp(words[0], "audio") == 0){
         	if(strcasecmp(words[1], "collision") == 0){
         		collision();
+        		return;
         	}
         	if(strcasecmp(words[1], "score") == 0){
         		score();
+        		return;
+        	}
+        	if(strcasecmp(words[1], "win") == 0){
+        		win();
+        		return;
         	}
         }
 
