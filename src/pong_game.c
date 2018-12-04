@@ -32,20 +32,8 @@ typedef enum GameScreen {
 
 int padd1PosY = PADDLE_BUFF + PADDLE_W;  // it'll be 5 pixels from edge
 
-<<<<<<< HEAD
 
-int ballSize = 2; // 2 pixels^2
-int paddSizeLen = 16; // paddSizeLen
-int paddSizeWidth = 8; // paddSizeWidth
-
-int padd1PosH = 16;  // it'll be 5 pixels from edge
-int padd2PosH = 123; // 128 - 10 + 5, it will be 5 pixels from edge
-
-int pong1Pos = 64/2; // in center of game board
-int pong2Pos = 64/2; // in center of game board
-=======
 int padd2PosY = DISP_W - PADDLE_BUFF - PADDLE_W; // 128 - 10 + 5, it will be 5 pixels from edge
->>>>>>> 0222ebc40bb4219c7848a930c4788fe1d99b91d9
 
 int stdVol = 1; // 1 pixel per iteration
 int lastWinner = -1;
@@ -70,7 +58,7 @@ void play_game(uint16_t * controllers){
             pTwoScore = 0;
             display_start_screen();
             // DISPLAY "SLIDE RIGHT TO START"
-            display_score(pOneScore, pTwoScore);
+            // display_score(pOneScore, pTwoScore);
             // DISPLAY START SCORE TO 00
             display_pong1(DISP_S / 2 - PADDLE_W / 2);
             display_pong2(DISP_S / 2 - PADDLE_W / 2);
@@ -78,9 +66,10 @@ void play_game(uint16_t * controllers){
             GAMESTATE = WAITSTART;
             break;
         case WAITSTART:
-            if (controllers[0] > (4095 / 4) * 3){
+            update_controllers(controllers);
+            if ((int) controllers[0] > (4095 / 4) * 3){
                 GAMESTATE = START;
-            }else if(controllers[1] > (4095 / 4) * 3){
+            }else if((int) controllers[1] > (4095 / 4) * 3){
                 GAMESTATE = START;
             }
             break;
@@ -108,6 +97,8 @@ void play_game(uint16_t * controllers){
             break;
         case INPLAY:
             nano_wait(100000000);
+            // update controller values from ADC
+            update_controllers(controllers);
             // update position of ball
             update_ball_pos(&square);
             // update paddle1 velocity
@@ -119,6 +110,11 @@ void play_game(uint16_t * controllers){
             // update position of paddle2
             update_padd_pos(&padd2);
             // check if position of ball is in colliding
+            // display new positions
+            display_ball(square.posX, square.posY);
+            display_pong1(padd1.pos);
+            display_pong2(padd2.pos);
+
             if (square.posX > DISP_S - BALL_S){
                 square.volX *= -1;
             }

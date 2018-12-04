@@ -22,7 +22,7 @@ void run_adc(uint16_t* controllers){
     while(1){
         while(!(ADC1->ISR & ADC_ISR_ADRDY));
         ADC1->CR |= ADC_CR_ADSTART;
-        //while(!(ADC1->ISR & ADC_ISR_EOC));
+        while(!(ADC1->ISR & ADC_ISR_EOSEQ));
         //sprintf(line, "Integer: 0x%x", controller);
         //display1(line);
         //sprintf(line, "Integer: 0x%x", controllers[1]);
@@ -34,9 +34,10 @@ void run_adc(uint16_t* controllers){
 }
 
 void update_controllers(uint16_t * controllers){
-	while(!(ADC1->ISR & ADC_ISR_ADRDY));
-	ADC1->CR |= ADC_CR_ADSTART;
-	while(!(ADC1->ISR & ADC_ISR_EOC));
+    while(!(ADC1->ISR & ADC_ISR_ADRDY));
+    ADC1->CR |= ADC_CR_ADSTART;
+    while(!(ADC1->ISR & ADC_ISR_EOSEQ));
+	//while(!(ADC1->ISR & ADC_ISR_EOC));
 }
 
 void calib_adc(){
