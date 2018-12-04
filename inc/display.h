@@ -25,9 +25,11 @@
 
 
 #define DISP_S 64 // display size
+#define DISP_W 128 // display width
 #define DISP_R 8 // display row size
 #define BALL_S 4 // must stay under 8
-#define PADDLE_W 8
+#define PADDLE_BUFF 4 // buffer from edge of display
+#define PADDLE_W 4
 #define PADDLE_L 16
 
 void write_display(int);
@@ -48,5 +50,6 @@ void display_pong2(int);
 void display_score(int, int);
 void display_start_screen();
 void display_winner(int);
+//void test_paddle();
 
 #endif /* DISPLAY_H_ */
