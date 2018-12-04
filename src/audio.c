@@ -109,7 +109,7 @@ void collision(){
 void score(){
 	tim2_int = 0;
 	TIM2->ARR = 80-1;
-	nano_wait(2000000000);
+	//ssnano_wait(2000000000);
 }
 
 void init_audio(){

@@ -107,7 +107,7 @@ void play_game(uint16_t * controllers){
             GAMESTATE = INPLAY;
             break;
         case INPLAY:
-            nano(100000000);
+            nano_wait(100000000);
             // update position of ball
             update_ball_pos(&square);
             // update paddle1 velocity
@@ -129,12 +129,14 @@ void play_game(uint16_t * controllers){
             if (square.posY >= PADDLE_BUFF && square.posY <= PADDLE_BUFF + PADDLE_W){
                 // collid with paddle 1
                 if (square.posX >= padd1.pos && square.posX <= padd1.pos + PADDLE_L){
+                    square.posY = PADDLE_BUFF+PADDLE_W+1;
                     square.volY *= -1;
                 }
             }
             if (square.posY <= DISP_W - PADDLE_BUFF && square.posY >= DISP_W - PADDLE_BUFF - PADDLE_W){
                 // collide with paddle 2
                 if (square.posX >= padd2.pos && square.posX <= padd2.pos + PADDLE_L){
+                    square.posY = DISP_W-PADDLE_BUFF-PADDLE_W;
                     square.volY *= -1;
                 }
             }

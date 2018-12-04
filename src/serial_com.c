@@ -193,6 +193,14 @@ void action(char **words, uint16_t * controllers) {
                 display_test();
                 return;
             }
+            if(strcasecmp(words[1], "paddle1") == 0){
+                display_pong1((int)strtoul(words[2], 0, 10));
+                return;
+            }
+            if(strcasecmp(words[1], "paddle2") == 0){
+                display_pong2((int)strtoul(words[2], 0, 10));
+                return;
+            }
         }
         if (strcasecmp(words[0], "set") == 0){
             if (strcasecmp(words[1], "column") == 0){
@@ -235,6 +243,12 @@ void action(char **words, uint16_t * controllers) {
 >>>>>>> 7cb2c42165d90437be414651bfffc07ef5f1627d
         	}
         }
+//        if (strcasecmp(words[0], "test") == 0){
+//            if (strcasecmp(words[1], "paddle") == 0){
+//                test_paddle();
+//                return;
+//            }
+//        }
 
         println("Unrecognized command.");
     }

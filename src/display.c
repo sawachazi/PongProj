@@ -529,11 +529,13 @@ void display_pong1(int y){
 	}
 
 	//turn on new bits;
+	rem = y % 8;
 	if (y < 8){
 		rem = y;
 	}
-	if (y > 56){
+	if (y > 48){
 		y = 48;
+		rem = 0;
 	}
 	set_row_addr(y / 8); //initial page of paddle
 	for (x = 0; x < PADDLE_W;  x++){
@@ -551,7 +553,7 @@ void display_pong1(int y){
 		rem3 = 16 - rem2;
 		for (x = 0; x < PADDLE_W;  x++){
 			set_col_addr(PADDLE_BUFF + x);
-			write_display(0xff >> (8- rem3));
+			write_display(0xff >> (rem3));
 		}
 	}
 	//update last position
@@ -567,7 +569,7 @@ void display_pong2(int y){
 	int x = 0;
 
 	//turn off old bits
-	if (paddle1_last_y >= 0){
+	if (paddle2_last_y >= 0){
 		if (paddle2_last_y > 8){
 			rem = paddle2_last_y;
 		}
@@ -579,7 +581,7 @@ void display_pong2(int y){
 			set_col_addr(DISP_S - (PADDLE_BUFF) - x);
 			write_display(0x0);
 		}
-		rem2 = 16 - 8 - rem;
+		rem2 = 16 - (8 - rem);
 		set_row_addr((paddle2_last_y / 8) + 1); //second page of paddle
 		for (x = 0; x < PADDLE_W;  x++){
 			set_col_addr(DISP_S - (PADDLE_BUFF) - x);
@@ -595,11 +597,13 @@ void display_pong2(int y){
 		}
 	}
 	//turn on new bits;
+	rem = y % 8;
 	if (y < 8){
 		rem = y;
 	}
-	if (y > 56){
+	if (y > 48){
 		y = 48;
+		rem = 0;
 	}
 	set_row_addr(y / 8); //initial page of paddle
 	for (x = 0; x < PADDLE_W;  x++){
@@ -616,8 +620,8 @@ void display_pong2(int y){
 		set_row_addr((y / 8) + 2);
 		rem3 = 16 - rem2;
 		for (x = 0; x < PADDLE_W;  x++){
-			set_col_addr(64 - PADDLE_BUFF + x);
-			write_display(0xff >> (8- rem3));
+			set_col_addr(64 - PADDLE_BUFF - x);
+			write_display(0xff >> (rem3));
 		}
 	}
 	//update last position
