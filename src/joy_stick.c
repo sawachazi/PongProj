@@ -33,6 +33,12 @@ void run_adc(uint16_t* controllers){
     }
 }
 
+void update_controllers(uint16_t * controllers){
+	while(!(ADC1->ISR & ADC_ISR_ADRDY));
+	ADC1->CR |= ADC_CR_ADSTART;
+	while(!(ADC1->ISR & ADC_ISR_EOC));
+}
+
 void calib_adc(){
     if ((ADC1->CR & ADC_CR_ADEN) != 0) /* (1) */
     {

@@ -17,8 +17,8 @@ typedef struct PongBall{
 
 
 typedef struct PongPaddle{
-    int posY;
-    int volY;
+    int pos;
+    int vol;
 } Paddle;
 
 #endif /* PONG_GAME_H_ */

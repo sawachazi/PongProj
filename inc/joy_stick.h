@@ -11,5 +11,6 @@
 
 void calib_adc();
 void run_adc(uint16_t* controllers);
+void update_controllers(uint16_t *);
 
 #endif /* JOY_STICK_H_ */

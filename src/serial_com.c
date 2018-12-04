@@ -226,10 +226,13 @@ void action(char **words, uint16_t * controllers) {
         	if(strcasecmp(words[1], "score") == 0){
         		score();
         		return;
+<<<<<<< HEAD
         	}
         	if(strcasecmp(words[1], "win") == 0){
         		win();
         		return;
+=======
+>>>>>>> 7cb2c42165d90437be414651bfffc07ef5f1627d
         	}
         }
 

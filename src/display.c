@@ -9,9 +9,11 @@
 #include "stm32f0_discovery.h"
 #include "display.h"
 
-
 int ball_last_x = -1;
 int ball_last_y = -1;
+int paddle1_last_y = -1;
+int paddle2_last_y = -1;
+
 /*
  *  PB0-PB12 as GPIO outputs
  *  PB0-B7 connected to DISPLAY DB0-DB7
@@ -57,7 +59,7 @@ void display_on(){
     GPIOB->BSRR = EN; // set enable on
     nano_wait(500);
     //while(1){
-        //set_y_addr(0);
+        //set_col_addr(0);
         //set_display_start(0);
         //nano_wait(10000);
         //write_display();
@@ -488,11 +490,163 @@ void set_side(int x){
     }
 }
 
-//void display_pong1(int);
+
+void display_pong1(int y){
+	set_side(1);
+	set_col_addr(PADDLE_BUFF);
+	int rem = y % 8;
+	int rem2 = 0;
+	int rem3 = 0;
+	int x = 0;
+
+	//turn off old bits
+	if (paddle1_last_y >= 0){
+		if (paddle1_last_y < 8){
+			rem = paddle1_last_y;
+		}
+		if (paddle1_last_y > 56){
+				paddle1_last_y = 48;
+		}
+		set_row_addr(paddle1_last_y / 8); //initial page of paddle
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr(PADDLE_BUFF + x);
+			write_display(0x0);
+		}
+		rem2 = 16 - (8 - rem);
+		set_row_addr((paddle1_last_y / 8) + 1); //second page of paddle
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr(PADDLE_BUFF + x);
+			write_display(0x0); //will always write 8 bits to second called page for paddle
+		}
+		if (rem2 > 8){ //check to verify a 3rd page needed
+			set_row_addr((paddle1_last_y / 8) + 2);
+			rem3 = 16 - rem2;
+			for (x = 0; x < PADDLE_W;  x++){
+				set_col_addr(PADDLE_BUFF + x);
+				write_display(0x0);
+			}
+		}
+	}
+
+	//turn on new bits;
+	if (y < 8){
+		rem = y;
+	}
+	if (y > 56){
+		y = 48;
+	}
+	set_row_addr(y / 8); //initial page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr(PADDLE_BUFF + x);
+		write_display(0xff << rem);
+	}
+	rem2 = 16 - (8 - rem);
+	set_row_addr((y / 8) + 1); //second page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr(PADDLE_BUFF + x);
+		write_display(0xff); //will always write 8 bits to second called page for paddle
+	}
+	if (rem2 > 8){ //check to verify a 3rd page needed
+		set_row_addr((y / 8) + 2);
+		rem3 = 16 - rem2;
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr(PADDLE_BUFF + x);
+			write_display(0xff >> (8- rem3));
+		}
+	}
+	//update last position
+	paddle1_last_y = y;
+	}
+
+void display_pong2(int y){
+	set_side(2);
+	set_col_addr(DISP_S - PADDLE_BUFF);
+	int rem = y % 8;
+	int rem2 = 0;
+	int rem3 = 0;
+	int x = 0;
+
+	//turn off old bits
+	if (paddle1_last_y >= 0){
+		if (paddle2_last_y > 8){
+			rem = paddle2_last_y;
+		}
+		if (paddle2_last_y > 56){
+			paddle2_last_y = 48;
+		}
+		set_row_addr(paddle2_last_y / 8); //initial page of paddle
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr(DISP_S - (PADDLE_BUFF) - x);
+			write_display(0x0);
+		}
+		rem2 = 16 - 8 - rem;
+		set_row_addr((paddle2_last_y / 8) + 1); //second page of paddle
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr(DISP_S - (PADDLE_BUFF) - x);
+			write_display(0x0);
+		}
+		if (rem2 > 8){ //check to verifpaddle2_last_y a 3rd page needed
+			set_row_addr((paddle2_last_y / 8) + 2);
+			rem3 = 16 - rem2;
+			for (x = 0; x < PADDLE_W;  x++){
+				set_col_addr(DISP_S - (PADDLE_BUFF) - x);
+				write_display(0x0);
+			}
+		}
+	}
+	//turn on new bits;
+	if (y < 8){
+		rem = y;
+	}
+	if (y > 56){
+		y = 48;
+	}
+	set_row_addr(y / 8); //initial page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr(64 - PADDLE_BUFF - x);
+		write_display(0xff << rem);
+	}
+	rem2 = 16 - (8 - rem);
+	set_row_addr((y / 8) + 1); //second page of paddle
+	for (x = 0; x < PADDLE_W;  x++){
+		set_col_addr(64 - PADDLE_BUFF - x);
+		write_display(0xff); //will always write 8 bits to second called page for paddle
+	}
+	if (rem2 > 8){ //check to verify a 3rd page needed
+		set_row_addr((y / 8) + 2);
+		rem3 = 16 - rem2;
+		for (x = 0; x < PADDLE_W;  x++){
+			set_col_addr(64 - PADDLE_BUFF + x);
+			write_display(0xff >> (8- rem3));
+		}
+	}
+	//update last position
+	paddle2_last_y = y;
+}
+
+void display_score(int score1, int score2){
+	char line[18];
+	sprintf(line, "Player 1 score: %d", score1);
+	display1(line);
+	sprintf(line, "Player 2 score: %d", score2);
+	display2(line);
+}
+void display_start_screen(){
+	char line[21];
+	sprintf(line, "SLIDE RIGHT TO START");
+	display1(line);
+}
+void display_winner(int winner){
+	char line[26];
+	sprintf(line, "Player %d is the winner!", winner);
+	display1(line);
+	sprintf(line, "SLIDE RIGHT TO PLAY", winner);
+	display2(line);
+}
+
+//void (int);
 //void display_pong2(int);
 
 //void display_score(int, int);
 //void display_start_screen();
 //void display_winner(int);
-//void display_start_wait();
-
