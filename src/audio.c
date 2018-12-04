@@ -26,7 +26,7 @@ void init_pa4(){
  * and the interrupt turns itself off once the threshold is reached.
  */
 void TIM2_IRQHandler(void) {
-	if((TIM3->CR1 & TIM_CR1_CEN)){
+	if((TIM3->CR1 & TIM_CR1_CEN) | (tim2_int == 0)){
 		tim2_int++;
 		TIM3->CR1 &= ~TIM_CR1_CEN;	//Disable TIM3
 		switch(tim2_int){
