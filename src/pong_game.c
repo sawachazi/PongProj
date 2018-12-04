@@ -116,12 +116,14 @@ void play_game(uint16_t * controllers){
             display_pong2(padd2.pos);
 
             if (square.posX > DISP_S - BALL_S){
+                square.posX = DISP_S - BALL_S;
                 square.volX *= -1;
-                //collision();
+                collision();
             }
             if (square.posX < BALL_S){
+                square.posX = BALL_S;
                 square.volX *= -1;
-                //collision();
+                collision();
             }
             // paddles are 5pxl width and 5 pxls from edge of screen
             if (square.posY >= PADDLE_BUFF && square.posY <= PADDLE_BUFF + PADDLE_W){
@@ -129,7 +131,7 @@ void play_game(uint16_t * controllers){
                 if (square.posX >= padd1.pos && square.posX <= padd1.pos + PADDLE_L){
                     square.posY = PADDLE_BUFF+PADDLE_W+1;
                     square.volY *= -1;
-                    //collision();
+                    collision();
                 }
             }
             if (square.posY <= DISP_W - PADDLE_BUFF && square.posY >= DISP_W - PADDLE_BUFF - PADDLE_W){
@@ -137,7 +139,7 @@ void play_game(uint16_t * controllers){
                 if (square.posX >= padd2.pos && square.posX <= padd2.pos + PADDLE_L){
                     square.posY = DISP_W-PADDLE_BUFF-PADDLE_W;
                     square.volY *= -1;
-                    //collision();
+                    collision();
                 }
             }
             //      if so update velocity direction
