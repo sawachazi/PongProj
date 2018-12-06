@@ -210,20 +210,20 @@ void initialize_display(){
     clear_screen();
     // add dotted line down center of display
     // every other "page"
-    int x;
-    for(x = 0;x < 8;x++){
-        set_side(1);
-        set_row_addr(x);
-        set_col_addr(62);
-        write_display(0xf);
-        write_display(0xf);
-        set_side(2);
-        set_row_addr(x);
-        set_col_addr(0);
-        write_display(0xf);
-        write_display(0xf);
-    }
-    set_display_start(0);
+//    int x;
+//    for(x = 0;x < 8;x++){
+//        set_side(1);
+//        set_row_addr(x);
+//        set_col_addr(62);
+//        write_display(0xf);
+//        write_display(0xf);
+//        set_side(2);
+//        set_row_addr(x);
+//        set_col_addr(0);
+//        write_display(0xf);
+//        write_display(0xf);
+//    }
+//    set_display_start(0);
 }
 
 void get_ball_bits(int x, int * upper_bits, int * lower_bits, int * full_bits){
@@ -246,7 +246,20 @@ void delete_old_ball(int x, int y){
     int full_bits;
     int row;
     int i;
-    row = x / DISP_R;
+
+    if (x > DISP_S - BALL_S){
+        x = DISP_S - BALL_S;
+    }else if(x < 0){
+        x = 0;
+    }
+    if (y < 0){
+        y = 0;
+    }else if(y > DISP_W - BALL_S){
+        y = DISP_W - BALL_S;
+    }
+
+    row = x / 8;
+    //row = x / DISP_R;
     if(y > DISP_S - 1){
         set_side(2);
         set_col_addr(y - DISP_S);
@@ -352,6 +365,17 @@ void display_ball(int x, int y){
     int lower_bits;
     int full_bits;
     int i;
+    if (x > DISP_S - BALL_S){
+        x = DISP_S - BALL_S;
+    }else if(x < 0){
+        x = 0;
+    }
+    if (y < 0){
+        y = 0;
+    }else if(y > DISP_W - BALL_S){
+        y = DISP_W - BALL_S;
+    }
+
     row = x / 8;
     if (ball_last_x != -1 && ball_last_y != -1){
         delete_old_ball(ball_last_x, ball_last_y);
@@ -380,7 +404,7 @@ void display_ball(int x, int y){
         }
     }else{
         get_ball_bits(x, &upper_bits, &lower_bits, &full_bits);
-        if (y + BALL_S >= DISP_S){
+        if (y + BALL_S > DISP_S){
             // Select CS1 set bits
             if (full_bits == 0x55){
                 set_side(1);
@@ -459,14 +483,19 @@ void display_ball(int x, int y){
 void display_test(){
     int x;
     int y;
-    y = 64;
+    y = 72;
     for(x = 5; x < 64 - BALL_S;x += BALL_S){
        // for(y = BALL_S;y < 128 - BALL_S;y += BALL_S){
             display_ball(x, y);
             nano_wait(100000000);
-            y += BALL_S;
+            y -= BALL_S;
        // }
     }
+//    display_ball(5, 67);
+//    nano_wait(100000000);
+//    display_ball(5, 63);
+//    nano_wait(100000000);
+//    display_ball(5, 59);
 }
 
 void test_line(int x){
