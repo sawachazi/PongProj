@@ -66,6 +66,7 @@ void play_game(uint16_t * controllers){
             GAMESTATE = WAITSTART;
             break;
         case WAITSTART:
+            init_audio();
             update_controllers(controllers);
             if ((int) controllers[0] > (4095 / 4) * 3){
                 GAMESTATE = START;
@@ -83,7 +84,7 @@ void play_game(uint16_t * controllers){
             square.posX = rand() % DISP_S; // 128/2
             square.posY = DISP_W / 2 - (BALL_S / 2);
             square.volX = stdVol * 2 * lastWinner;//rand() % 5 * lastWinner;
-            square.volY = stdVol * 2;//rand() % 5;
+            square.volY = stdVol * 2 * lastWinner;//rand() % 5;
             // initialize paddles
             padd1.pos = DISP_S / 2 - PADDLE_W / 2;
             padd1.vol = 0;
@@ -182,6 +183,7 @@ void play_game(uint16_t * controllers){
             //display_end_start();
             pOneScore = 0;
             pTwoScore = 0;
+            nano_wait(2000000000);
             GAMESTATE = WAITSTART;
             // DISPLAY "PLAYER X WON" under score
             // DISPLAY "SLIDE RIGHT" TO START NEW GAME
